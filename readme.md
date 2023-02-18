@@ -6,6 +6,13 @@ Create pgp keys, encrypt and decrypt messages, sign messages and verift signed m
 
 Perfect for the novice to begin secure communication online.
 
+
+**Example of GUI:**
+
+![example gui image](assets/example.png)
+
+
+
 ## Installation
 
 Download and install can be done through PyPi
