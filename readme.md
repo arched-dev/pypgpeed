@@ -11,9 +11,18 @@ Perfect for the novice to begin secure communication online.
 
 ![example gui image](assets/example.png)
 
+## Usage - if you don't have python or don't even know what that is.
 
+> ### Windows
+> Just click [here](https://drive.google.com/u/0/uc?id=1s_dl9kKAeAH3qqE243vIbR3dvXY8ORYw&export=download) and run. It's a hefty file like this... but it is what it is.
+> 
+> ### Linux
+> Come on what are you playing at ... read below.
+> 
+> ### Mac
+> Literally no idea if it works, but I believe just follow the instructions below. 
 
-## Installation
+## Installation - if you have python installed.
 
 Download and install can be done through PyPi
 
@@ -24,23 +33,20 @@ pip install pypgpeed
 or
 
 ```python
-git
-clone
-https: // github.com / lewis - morris / pypgped
-cd
-pypgped
-pip
-install - e.
+git clone https://github.com/lewis-morris/pypgpeed
+cd pypgpeed
+pip install - e.
 ```
 
-### Running
+## Running
 
 > ### Linux & Windows
+> 
 > Once installed you should be able to run in the console. `pypgpeed`
 >
 > If this does not work you can run with `python -c "from pypgpeed import run_gui; run_gui()"`
 
-### Usage
+## Usage
 
 To begin communicating via PGP you will need a private and a public key, this software enforces that you have a
 passphrase attached to your private key for extra security.
