@@ -1,0 +1,4 @@
+PyQt6~=6.4.2
+PGPy~=0.6.0
+setuptools~=66.0.0
+qt_material~=2.14
