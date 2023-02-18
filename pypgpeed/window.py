@@ -7,8 +7,8 @@ from PyQt6.QtGui import QAction, QGuiApplication
 from PyQt6.QtWidgets import QMainWindow, QTabWidget, QWidget, QVBoxLayout, QHBoxLayout, QTextEdit, QLabel, \
     QPushButton, QMessageBox, QDialog, QDialogButtonBox, QFileDialog
 
-from pypgped import decrypt_message, encrypt_message, encrypt_cleartext_message, verify_message, make_key
-from pypgped.functions import get_stored_keys
+from pypgpeed import decrypt_message, encrypt_message, encrypt_cleartext_message, verify_message, make_key
+from pypgpeed.functions import get_stored_keys
 
 
 class AboutDialog(QDialog):
@@ -197,6 +197,9 @@ class PGP_Main(QMainWindow):
         decrypt_pass_box.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         decrypt_pass_box.setFixedHeight(45)
 
+        decrypt_widget = QWidget()
+        decrypt_hbox = QHBoxLayout(decrypt_widget)
+
         copy_button_decrypt = QPushButton("Copy Text")
         copy_button_decrypt.clicked.connect(
             lambda: self.copy_text(decrypt_output_box, copy_button_decrypt))
@@ -209,6 +212,8 @@ class PGP_Main(QMainWindow):
             lambda: decrypt_message(decrypt_message_box.toPlainText(), decrypt_private_key_box.toPlainText(),
                                     decrypt_pass_box.toPlainText(),
                                     decrypt_output_box))
+        decrypt_hbox.addWidget(decrypt_button)
+        decrypt_hbox.addWidget(copy_button_decrypt)
 
         # Add widgets to layouts
         decrypt_layout = QVBoxLayout()
@@ -222,8 +227,10 @@ class PGP_Main(QMainWindow):
         decrypt_layout.addWidget(decrypt_pass_box)
         decrypt_layout.addWidget(QLabel("Output:"))
         decrypt_layout.addWidget(decrypt_output_box)
-        decrypt_layout.addWidget(copy_button_decrypt)
-        decrypt_layout.addWidget(decrypt_button)
+        decrypt_layout.addWidget(decrypt_widget)
+
+        # decrypt_layout.addWidget(copy_button_decrypt)
+        # decrypt_layout.addWidget(decrypt_button)
         self.decrypt_tab.setLayout(decrypt_layout)
 
         # Create widgets for "ENCRYPT" tab
@@ -238,6 +245,10 @@ class PGP_Main(QMainWindow):
         encrypt_output_box.setProperty('class', 'warning')
         encrypt_output_box.setReadOnly(True)
 
+
+        encrypt_widget = QWidget()
+        encrypt_hbox = QHBoxLayout(encrypt_widget)
+
         copy_button_encrypt = QPushButton("Copy Text")
         copy_button_encrypt.clicked.connect(
             lambda: self.copy_text(encrypt_output_box, copy_button_encrypt))
@@ -251,6 +262,9 @@ class PGP_Main(QMainWindow):
             lambda: encrypt_message(encrypt_message_box.toPlainText(), encrypt_public_key_box.toPlainText(),
                                     encrypt_output_box))
 
+        encrypt_hbox.addWidget(encrypt_button)
+        encrypt_hbox.addWidget(copy_button_encrypt)
+
         # Add widgets to layouts
         encrypt_layout = QVBoxLayout()
         encrypt_layout.addWidget(QLabel(
@@ -261,8 +275,10 @@ class PGP_Main(QMainWindow):
         encrypt_layout.addWidget(encrypt_public_key_box)
         encrypt_layout.addWidget(QLabel("Output:"))
         encrypt_layout.addWidget(encrypt_output_box)
-        encrypt_layout.addWidget(copy_button_encrypt)
-        encrypt_layout.addWidget(encrypt_button)
+        encrypt_layout.addWidget(encrypt_widget)
+        # encrypt_layout.addWidget(copy_button_encrypt)
+        # encrypt_layout.addWidget(encrypt_button)
+
         self.encrypt.setLayout(encrypt_layout)
 
         # Create widgets for "SIGN" tab
@@ -280,6 +296,9 @@ class PGP_Main(QMainWindow):
         sign_passphrase_box.setFixedHeight(45)
         sign_passphrase_box.setTabChangesFocus(True)
 
+        sign_widget = QWidget()
+        sign_hbox = QHBoxLayout(sign_widget)
+
         copy_button_sign = QPushButton("Copy Text")
         copy_button_sign.clicked.connect(
             lambda: self.copy_text(sign_output_box, copy_button_sign))
@@ -293,6 +312,10 @@ class PGP_Main(QMainWindow):
             lambda: encrypt_cleartext_message(sign_message_box.toPlainText(), sign_private_key_box.toPlainText(),
                                               sign_passphrase_box.toPlainText(), sign_output_box))
 
+
+        sign_hbox.addWidget(sign_button)
+        sign_hbox.addWidget(copy_button_sign)
+
         # Add widgets to layouts
         sign_layout = QVBoxLayout()
         sign_layout.addWidget(QLabel(
@@ -305,8 +328,9 @@ class PGP_Main(QMainWindow):
         sign_layout.addWidget(sign_passphrase_box)
         sign_layout.addWidget(QLabel("Output:"))
         sign_layout.addWidget(sign_output_box)
-        sign_layout.addWidget(copy_button_sign)
-        sign_layout.addWidget(sign_button)
+        sign_layout.addWidget(sign_widget)
+        # sign_layout.addWidget(copy_button_sign)
+        # sign_layout.addWidget(sign_button)
         self.sign_tab.setLayout(sign_layout)
 
         # Create widgets for "VERIFY" tab
@@ -320,6 +344,10 @@ class PGP_Main(QMainWindow):
         verify_output_box.setProperty('class', 'warning')
         verify_output_box.setReadOnly(True)
 
+
+        verify_widget = QWidget()
+        verify_hbox = QHBoxLayout(verify_widget)
+
         copy_button_verify = QPushButton("Copy Text")
         copy_button_verify.clicked.connect(
             lambda: self.copy_text(verify_output_box, copy_button_verify))
@@ -332,6 +360,9 @@ class PGP_Main(QMainWindow):
             lambda: verify_message(verify_message_box.toPlainText(), verify_public_key_box.toPlainText(),
                                    verify_output_box))
 
+        verify_hbox.addWidget(verify_button)
+        verify_hbox.addWidget(copy_button_verify)
+
         # Add widgets to layouts
         verify_layout = QVBoxLayout()
         verify_layout.addWidget(QLabel("Verify a signed message that has been sent\n"))
@@ -341,8 +372,9 @@ class PGP_Main(QMainWindow):
         verify_layout.addWidget(verify_public_key_box)
         verify_layout.addWidget(QLabel("Output:"))
         verify_layout.addWidget(verify_output_box)
-        verify_layout.addWidget(copy_button_verify)
-        verify_layout.addWidget(verify_button)
+        verify_layout.addWidget(verify_widget)
+        # verify_layout.addWidget(copy_button_verify)
+        # verify_layout.addWidget(verify_button)
         self.verify_tab.setLayout(verify_layout)
 
         # Set main layout and add tabs
@@ -405,7 +437,7 @@ class PGP_Main(QMainWindow):
 
     def home_show(self):
         # Defines a URL to be opened in the default web browser
-        url = 'https://www.google.com'
+        url = 'https://github.com/lewis-morris/pypgpeed'
         # Opens the specified URL in the default web browser
         webbrowser.open(url)
 

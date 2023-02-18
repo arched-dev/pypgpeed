@@ -4,7 +4,7 @@ from pgpy.constants import PubKeyAlgorithm, HashAlgorithm, SymmetricKeyAlgorithm
 import pgpy
 from pgpy import PGPMessage, PGPKey
 
-from pypgped.functions import get_box, make_directory
+from pypgpeed.functions import get_box, make_directory
 
 
 def make_key(name, email, passphrase, loc):

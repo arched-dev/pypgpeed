@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from pypgped import run_gui
+from pypgpeed import run_gui
 
 
 def run():
