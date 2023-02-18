@@ -2,7 +2,7 @@
 
 ## 'py-p-g-peed' A PGP Gui utility
 
-Create pgp keys, encrypt and decrypt messages, sign messages and verift signed messaged.
+Create pgp keys, encrypt and decrypt messages, sign messages and verify messages.
 
 Perfect for the novice to begin secure communication online.
 
