@@ -30,6 +30,7 @@ jobs:
     - name: Run tests
       env:
         QT_DEBUG_PLUGINS: 1
-        run: |
-          ulimit -c unlimited
-          sudo catchsegv xvfb-run --auto-servernum `which coverage` run -m python -m unittest discover -s tests
+      run: |
+        ulimit -c unlimited
+        sudo catchsegv xvfb-run --auto-servernum `which coverage` run -m python -m unittest discover -s tests
+
