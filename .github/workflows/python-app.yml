@@ -32,6 +32,5 @@ jobs:
       env:
         QT_DEBUG_PLUGINS: 1
       run: |
-        ulimit -c unlimited
         sudo xvfb-run --auto-servernum `which coverage` run -m python -m unittest discover -s tests
 
