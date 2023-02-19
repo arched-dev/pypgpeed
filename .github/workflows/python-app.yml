@@ -24,5 +24,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        sudo apt-get install libegl1-mesa
+        export LD_LIBRARY_PATH=/usr/lib
     - name: Run tests
       run: python -m unittest discover -s tests
