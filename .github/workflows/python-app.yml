@@ -26,6 +26,7 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         sudo apt-get install libegl1-mesa
         sudo apt-get install xclip
+        sudo apt-get install gdb
         export LD_LIBRARY_PATH=/usr/lib
     - name: Run tests
       env:
