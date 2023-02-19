@@ -4,7 +4,7 @@ import unittest
 from pypgpeed import make_key, encrypt_message, decrypt_message, encrypt_cleartext_message, verify_message as vf_msg
 
 
-class MyTestCase(unittest.TestCase):
+class MyPGPTest(unittest.TestCase):
     def setUp(self):
         temp_dir = tempfile.TemporaryDirectory()
         self.person_one_pri, self.person_one_pub = make_key("person1", "person1@test.com", "TeStPaSs1!", temp_dir.name)

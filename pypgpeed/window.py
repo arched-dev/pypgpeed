@@ -2,6 +2,7 @@ import os
 import re
 import webbrowser
 
+import pyperclip
 from PyQt6.QtCore import Qt, pyqtSignal, QTimer
 from PyQt6.QtGui import QAction, QGuiApplication
 from PyQt6.QtWidgets import QMainWindow, QTabWidget, QWidget, QVBoxLayout, QHBoxLayout, QTextEdit, QLabel, \
@@ -128,8 +129,13 @@ class GenerateDialog(QDialog):
 
 
 class PGP_Main(QMainWindow):
-    def __init__(self):
+    error_window_shown = pyqtSignal()
+    def __init__(self, test=False):
         super().__init__()
+
+        self.test_mode = test
+        self.error_window = QMessageBox()
+        self.error_window.setObjectName("error_window")
 
         menubar = self.menuBar()
 
@@ -184,25 +190,32 @@ class PGP_Main(QMainWindow):
         # Create widgets for "DECRYPT" tab
         decrypt_message_box = QTextEdit()
         decrypt_message_box.setTabChangesFocus(True)
+        decrypt_message_box.setObjectName("decrypt_message_box")
+
         decrypt_private_key_box = QTextEdit()
         self.key_boxes["private"].append(decrypt_private_key_box)
+        decrypt_private_key_box.setObjectName("decrypt_private_key_box")
 
         decrypt_private_key_box.setTabChangesFocus(True)
+
         decrypt_output_box = QTextEdit()
         decrypt_output_box.setProperty('class', 'warning')
         decrypt_output_box.setReadOnly(True)
+        decrypt_output_box.setObjectName("decrypt_output_box")
 
         decrypt_pass_box = QTextEdit()
         decrypt_pass_box.setTabChangesFocus(True)
         decrypt_pass_box.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         decrypt_pass_box.setFixedHeight(45)
+        decrypt_pass_box.setObjectName("decrypt_pass_box")
 
         decrypt_widget = QWidget()
         decrypt_hbox = QHBoxLayout(decrypt_widget)
 
         copy_button_decrypt = QPushButton("Copy Text")
+        copy_button_decrypt.setObjectName("copy_button_decrypt")
         copy_button_decrypt.clicked.connect(
-            lambda: self.copy_text(decrypt_output_box, copy_button_decrypt))
+            lambda: self.copy_text(decrypt_output_box, copy_button_decrypt, True))
         copy_button_decrypt.setProperty('class', 'success')
         self.copy_buttons.append(copy_button_decrypt)
 
@@ -212,6 +225,8 @@ class PGP_Main(QMainWindow):
             lambda: decrypt_message(decrypt_message_box.toPlainText(), decrypt_private_key_box.toPlainText(),
                                     decrypt_pass_box.toPlainText(),
                                     decrypt_output_box))
+        decrypt_button.setObjectName("decrypt_button")
+
         decrypt_hbox.addWidget(decrypt_button)
         decrypt_hbox.addWidget(copy_button_decrypt)
 
@@ -236,14 +251,19 @@ class PGP_Main(QMainWindow):
         # Create widgets for "ENCRYPT" tab
         encrypt_message_box = QTextEdit()
         encrypt_message_box.setTabChangesFocus(True)
+        encrypt_message_box.setObjectName("encrypt_message_box")
+
+
         encrypt_public_key_box = QTextEdit()
         encrypt_public_key_box.setTabChangesFocus(True)
+        encrypt_public_key_box.setObjectName("encrypt_public_key_box")
 
 
 
         encrypt_output_box = QTextEdit()
         encrypt_output_box.setProperty('class', 'warning')
         encrypt_output_box.setReadOnly(True)
+        encrypt_output_box.setObjectName("encrypt_output_box")
 
 
         encrypt_widget = QWidget()
@@ -254,6 +274,7 @@ class PGP_Main(QMainWindow):
             lambda: self.copy_text(encrypt_output_box, copy_button_encrypt))
         copy_button_encrypt.setProperty('class', 'success')
         self.copy_buttons.append(copy_button_encrypt)
+        copy_button_encrypt.setObjectName("copy_button_encrypt")
 
 
         encrypt_button = QPushButton("Generate")
@@ -261,6 +282,7 @@ class PGP_Main(QMainWindow):
         encrypt_button.clicked.connect(
             lambda: encrypt_message(encrypt_message_box.toPlainText(), encrypt_public_key_box.toPlainText(),
                                     encrypt_output_box))
+        encrypt_button.setObjectName("encrypt_button")
 
         encrypt_hbox.addWidget(encrypt_button)
         encrypt_hbox.addWidget(copy_button_encrypt)
@@ -284,17 +306,23 @@ class PGP_Main(QMainWindow):
         # Create widgets for "SIGN" tab
         sign_message_box = QTextEdit()
         sign_message_box.setTabChangesFocus(True)
+        sign_message_box.setObjectName("sign_message_box")
+
         sign_private_key_box = QTextEdit()
         self.key_boxes["private"].append(sign_private_key_box)
         sign_private_key_box.setTabChangesFocus(True)
+        sign_private_key_box.setObjectName("sign_private_key_box")
 
         sign_output_box = QTextEdit()
         sign_output_box.setProperty('class', 'warning')
         sign_output_box.setReadOnly(True)
+        sign_output_box.setObjectName("sign_output_box")
 
         sign_passphrase_box = QTextEdit()
         sign_passphrase_box.setFixedHeight(45)
         sign_passphrase_box.setTabChangesFocus(True)
+        sign_passphrase_box.setObjectName("sign_passphrase_box")
+
 
         sign_widget = QWidget()
         sign_hbox = QHBoxLayout(sign_widget)
@@ -304,6 +332,8 @@ class PGP_Main(QMainWindow):
             lambda: self.copy_text(sign_output_box, copy_button_sign))
         copy_button_sign.setProperty('class', 'success')
         self.copy_buttons.append(copy_button_sign)
+        copy_button_sign.setObjectName("copy_button_sign")
+
 
         sign_button = QPushButton("Generate")
         sign_button.setProperty('class', 'warning')
@@ -311,7 +341,7 @@ class PGP_Main(QMainWindow):
         sign_button.clicked.connect(
             lambda: encrypt_cleartext_message(sign_message_box.toPlainText(), sign_private_key_box.toPlainText(),
                                               sign_passphrase_box.toPlainText(), sign_output_box))
-
+        sign_button.setObjectName("sign_button")
 
         sign_hbox.addWidget(sign_button)
         sign_hbox.addWidget(copy_button_sign)
@@ -336,13 +366,18 @@ class PGP_Main(QMainWindow):
         # Create widgets for "VERIFY" tab
         verify_message_box = QTextEdit()
         verify_message_box.setTabChangesFocus(True)
+        verify_message_box.setObjectName("verify_message_box")
+
         verify_public_key_box = QTextEdit()
         self.key_boxes["public"].append(verify_public_key_box)
-
         verify_public_key_box.setTabChangesFocus(True)
+        verify_public_key_box.setObjectName("verify_public_key_box")
+
+
         verify_output_box = QTextEdit()
         verify_output_box.setProperty('class', 'warning')
         verify_output_box.setReadOnly(True)
+        verify_output_box.setObjectName("verify_output_box")
 
 
         verify_widget = QWidget()
@@ -353,12 +388,15 @@ class PGP_Main(QMainWindow):
             lambda: self.copy_text(verify_output_box, copy_button_verify))
         copy_button_verify.setProperty('class', 'success')
         self.copy_buttons.append(copy_button_verify)
+        copy_button_verify.setObjectName("copy_button_verify")
 
         verify_button = QPushButton("Generate")
         verify_button.setProperty('class', 'warning')
         verify_button.clicked.connect(
             lambda: verify_message(verify_message_box.toPlainText(), verify_public_key_box.toPlainText(),
                                    verify_output_box))
+        verify_button.setObjectName("verify_button")
+
 
         verify_hbox.addWidget(verify_button)
         verify_hbox.addWidget(copy_button_verify)
@@ -387,14 +425,25 @@ class PGP_Main(QMainWindow):
 
         self.setup_keys()
 
-    def copy_text(self, textbox, copyButton):
+    def copy_text(self, textbox, copyButton, needs_pgp=True):
         # Copy the text from the text box to the clipboard
         text = textbox.toPlainText()
-        if not text or not "---" in text:
-            QMessageBox.warning(self, "Error", "Nothing to copy...")
-            return
+        if not text:
+            if needs_pgp and not "---" in text or not needs_pgp:
+
+                if self.test_mode:
+                    self.error_window_shown.emit()
+                    return True
+                else:
+                    self.error_window.warning(self, "Error", "Nothing to copy...")
+                    return
         clipboard = QGuiApplication.clipboard()
-        clipboard.setText(text)
+        try:
+            clipboard.setText(text)
+            pyperclip.copy(text)
+        except:
+            QMessageBox.warning(self, "Error", "Error copying")
+            return
 
         # Change the button text to "Copied"
         copyButton.setText("Copied")
