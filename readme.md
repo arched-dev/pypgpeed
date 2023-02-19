@@ -2,6 +2,8 @@
 
 ## 'py-p-g-peed' A PGP Gui utility
 
+![example workflow](https://github.com/lewis-morris/pygpgeed/actions/workflows/<WORKFLOW_FILE>/badge.svg)
+
 Create pgp keys, encrypt and decrypt messages, sign messages and verify messages.
 
 Perfect for the novice to begin secure communication online.

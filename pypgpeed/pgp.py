@@ -38,9 +38,7 @@ def make_key(name, email, passphrase, loc):
     # Write the ASCII-armored public key to a file in the given location
     with open(os.path.join(loc, "pub_key.key"), "w") as f:
         f.write(str(key.pubkey))
-
-
-
+    return str(key), str(key.pubkey)
 
 
 def check_text_and_key(func):
@@ -90,8 +88,10 @@ def unlock_passphrase(func):
 
         except Exception as e:
             # Set the text of the box object to an error message and return
-            box.setText("Passphrase Error")
-            return
+            if box:
+                box.setText("Passphrase Error")
+            else:
+                return False
 
     return wrapper
 
@@ -183,7 +183,10 @@ def verify_message(text, in_key, box=None):
     try:
         key_out = in_key.verify(message)
         if key_out.__bool__():
-            box.setText("Message verified... It was created by the owner of this public key.")
+            if box:
+                box.setText("Message verified... It was created by the owner of this public key.")
+            else:
+                return True
     except:
         return False
 
