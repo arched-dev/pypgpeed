@@ -36,7 +36,6 @@ jobs:
     - name: Run tests
       env:
         QT_DEBUG_PLUGINS: 1
-        DISPLAY: ':99.0'
       run: |
         xvfb-run --auto-servernum coverage run --source=pypgpeed -m unittest discover -s tests
         rm tests/coverage.txt
