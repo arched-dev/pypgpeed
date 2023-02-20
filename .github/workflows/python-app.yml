@@ -32,8 +32,9 @@ jobs:
         sudo apt install -y xvfb x11-utils libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xfixes0 xdotool
         export LD_LIBRARY_PATH=/usr/lib
     - name: Run tests
-      env:
+      env: |
         QT_DEBUG_PLUGINS: 1
+        DISPLAY: ':99.0'
       run: |
         xvfb-run --auto-servernum python -m unittest discover -s tests
 
