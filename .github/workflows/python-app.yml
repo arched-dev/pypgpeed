@@ -27,6 +27,7 @@ jobs:
         sudo apt-get install xclip
         sudo apt-get install gdb
         sudo apt-get install libxkbcommon-x11-0
+        sudo apt-get install libxcb-icccm4
         export LD_LIBRARY_PATH=/usr/lib
     - name: Run tests
       env:
