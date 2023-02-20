@@ -36,5 +36,5 @@ jobs:
         QT_DEBUG_PLUGINS: 1
         DISPLAY: ':99.0'
       run: |
-        catchsegv xvfb-run --auto-servernum python -m unittest discover -s tests
+        xvfb-run --auto-servernum python -m unittest discover -s tests
 
