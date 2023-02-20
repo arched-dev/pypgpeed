@@ -54,5 +54,5 @@ jobs:
         author_email: lewis.morris@gmail.com
         message: "Update coverage"
         add: |
-          "coverage.txt"
-          "coverage.svg"
+          "tests/coverage.txt"
+          "assets/coverage.svg"
