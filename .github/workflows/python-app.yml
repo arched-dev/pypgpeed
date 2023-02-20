@@ -40,7 +40,6 @@ jobs:
       run: |
         xvfb-run --auto-servernum coverage run --source=pypgpeed -m unittest discover -s tests
         coverage report -m > coverage.txt
-        rm coverage.svg
         coverage-badge -o coverage.svg
 
     - name: Commit changes
