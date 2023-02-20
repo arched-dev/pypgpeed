@@ -75,7 +75,6 @@ class MyWindowTest(unittest.TestCase):
         self.assertIn('-----BEGIN PGP MESSAGE-----', clipboard_text)
 
     def test_decrypt(self):
-
         # create a message to send
         send_message = 'This is a test!'
         #person1 encrypt message
