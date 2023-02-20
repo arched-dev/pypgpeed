@@ -33,7 +33,7 @@ jobs:
         export LD_LIBRARY_PATH=/usr/lib
     - name: Run tests
       env: |
-        QT_DEBUG_PLUGINS: 1, DISPLAY: ':99.0'
+        QT_DEBUG_PLUGINS: 1
       run: |
         xvfb-run --auto-servernum python -m unittest discover -s tests
 
