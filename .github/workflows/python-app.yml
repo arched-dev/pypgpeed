@@ -59,10 +59,3 @@ jobs:
           tests/coverage.txt
           assets/coverage.svg
         force: true
-
-      run: |
-        xvfb-run --auto-servernum coverage run --source=pypgpeed -m unittest discover -s tests
-        coverage report -m > ${{github.workspace}}/tests/coverage.txt
-        coverage-badge -o ${{github.workspace}}/assets/coverage.svg
-        mv tests/coverage.txt "${{github.workspace}}/{project_path}/assets/"
-        mv assets/coverage.svg "${{github.workspace}}/{project_path}/assets/"
