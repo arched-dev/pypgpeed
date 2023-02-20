@@ -41,7 +41,7 @@ jobs:
         xvfb-run --auto-servernum coverage run --source=pypgpeed -m unittest discover -s tests
         coverage report -m > coverage.txt
         coverage-badge -o coverage.svg
-
+        ls
     - name: Commit changes
       uses: EndBug/add-and-commit@v9
 
@@ -50,5 +50,3 @@ jobs:
         author_email: lewis.morris@gmail.com
         message: "Update coverage"
         add: "coverage.txt, coverage.svg --force"
-        cwd: './assets/'
-        token: ${{ secrets.GITHUB_TOKEN }}
