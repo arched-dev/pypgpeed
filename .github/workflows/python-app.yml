@@ -49,4 +49,6 @@ jobs:
         author_name: Lewis
         author_email: lewis.morris@gmail.com
         message: "Update coverage"
-        add: "coverage.txt, coverage.svg --force"
+        add: |
+          "coverage.txt"
+          "coverage.svg"
