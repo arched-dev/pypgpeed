@@ -44,10 +44,11 @@ jobs:
 
     - name: Commit changes
       uses: EndBug/add-and-commit@v9
+
       with:
         author_name: Lewis
         author_email: lewis.morris@gmail.com
-        message: 'Your commit message'
-        add: |
-          'tests/coverage.txt'
-          'assets/coverage.svg'
+        message: "Update coverage"
+        add: "tests/coverage.txt, coverage-badge.svg"
+        force: "true"
+        token: ${{ secrets.GITHUB_TOKEN }}
