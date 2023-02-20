@@ -28,23 +28,6 @@ def wait_for_val(test, old_val, box):
         time.sleep(0.5)
         times += 1
     return new_output_text
-class DialogEventFilter(QObject):
-    def __init__(self, callback):
-        super().__init__()
-        self.event_loop = QEventLoop()
-        self.found = False
-        self.callback = callback
-
-    def eventFilter(self, obj, event):
-        if "error" in obj.objectName():
-
-            obj.close()
-            self.event_loop.quit()
-            self.found = True
-            self.callback(self.found)
-            return True
-
-        return False
 
 class MyWindowTest(unittest.TestCase):
     def setUp(self):
@@ -251,26 +234,80 @@ class MyWindowTest(unittest.TestCase):
                 else:
                     self.assertEqual(el.toPlainText().strip(), pub_key.strip())
 
+    def test_key_fail(self):
+        """ checks to make sure the validation on the key creation is working correctly """
+
+        passphrase_box = self.window.dlg.findChild(QTextEdit, "gen_passphrase_box")
+        name_box = self.window.dlg.findChild(QTextEdit, "gen_name_box")
+        email_box = self.window.dlg.findChild(QTextEdit, "gen_email_box")
+        output_location_box = self.window.dlg.findChild(QTextEdit, "gen_output_location_box")
 
 
 
+        # no name
+        name_box.setText("")
+        self.assertFalse(self.window.dlg.generate_key_validation(True))
 
-    # def test_copy(self):
-    #     """ checks to make sure the button doesn't copy when its blank """
-    #     for button in self.window.copy_buttons:
-    #
-    #
-    #         self.error_opened = False
-    #         def callback(found):
-    #             self.error_opened = found
-    #
-    #         dialog_event_filter = DialogEventFilter(callback)
-    #         QApplication.instance().installEventFilter(dialog_event_filter)
-    #         button.click()
-    #
-    #         # assert that the error dialog was opened and closed
-    #         self.assertTrue(self.error_opened)
+        # short name
+        name_box.setText("aa")
+        self.assertFalse(self.window.dlg.generate_key_validation(True))
 
+        # no email
+        name_box.setText("testuser1")
+        email_box.setText("")
+        self.assertFalse(self.window.dlg.generate_key_validation(True))
+
+        #invalid email
+        email_box.setText("test.com")
+        self.assertFalse(self.window.dlg.generate_key_validation(True))
+
+        #short passwork
+        email_box.setText("test@test.com")
+        passphrase_box.setText("testp")
+        self.assertFalse(self.window.dlg.generate_key_validation(True))
+
+
+        #short password
+        passphrase_box.setText("testp")
+        self.assertFalse(self.window.dlg.generate_key_validation(True))
+
+        #no upper
+        passphrase_box.setText("testpassword")
+        self.assertFalse(self.window.dlg.generate_key_validation(True))
+
+
+        #no upper
+        passphrase_box.setText("TESTPASSWORD")
+        self.assertFalse(self.window.dlg.generate_key_validation(True))
+
+
+        #no special
+        passphrase_box.setText("TESTpassword")
+        self.assertFalse(self.window.dlg.generate_key_validation(True))
+
+        #no output location
+        output_location_box.setText("")
+        self.assertFalse(self.window.dlg.generate_key_validation(True))
+
+    def test_copy(self):
+        """ checks to make sure the button doesn't copy when its blank """
+        self.error=False
+
+        def copy_text(textbox, copyButton, needs_pgp=True):
+            # Copy the text from the text box to the clipboard
+            text = textbox.toPlainText()
+            if not text:
+                if needs_pgp and not "---" in text or not needs_pgp:
+                    self.error = True
+
+        #monkey patch
+        setattr(self.window, "copy_text", copy_text)
+
+        for button in self.window.copy_buttons:
+            # click the moneykey patched button
+            button.click()
+            # assert that the error dialog was opened and closed
+            self.assertTrue(self.error)
 
 if __name__ == '__main__':
     unittest.main()

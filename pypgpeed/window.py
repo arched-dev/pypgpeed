@@ -91,7 +91,12 @@ class GenerateDialog(QDialog):
 
         self.setLayout(layout)
 
-    def generate_key_validation(self):
+    def _create_key(self, name, email, passphrase, output_location):
+        make_key(name, email, passphrase, output_location)
+        self.keys_generated.emit(output_location)
+        self.close()
+
+    def generate_key_validation(self, test=False):
         # Get the values from the text boxes
         name = self.name_box.toPlainText().strip()
         email = self.email_box.toPlainText().strip()
@@ -100,37 +105,37 @@ class GenerateDialog(QDialog):
 
         # Check if the values are valid
         if not name:
-            QMessageBox.warning(self, "Error", "Please enter a name.")
-            return
+            not test and QMessageBox.warning(self, "Error", "Please enter a name.")
+            return False
+        if not len(name) > 5:
+            not test and QMessageBox.warning(self, "Error", "Please enter a longer name.")
+            return False
         if not email:
-            QMessageBox.warning(self, "Error", "Please enter an email address.")
-            return
+            not test and QMessageBox.warning(self, "Error", "Please enter an email address.")
+            return False
         if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
-            QMessageBox.warning(self, "Error", "Please enter a valid email address.")
-            return
+            not test and QMessageBox.warning(self, "Error", "Please enter a valid email address.")
+            return False
         if not passphrase:
-            QMessageBox.warning(self, "Error", "Please enter a passphrase.")
-            return
+            not test and QMessageBox.warning(self, "Error", "Please enter a passphrase.")
+            return False
         if len(passphrase) < 8:
-            QMessageBox.warning(self, "Error", "Passphrase must be at least 8 characters long.")
-            return
+            not test and QMessageBox.warning(self, "Error", "Passphrase must be at least 8 characters long.")
+            return False
         if not any(char.isupper() for char in passphrase):
-            QMessageBox.warning(self, "Error", "Passphrase must contain at least one uppercase letter.")
-            return
+            not test and QMessageBox.warning(self, "Error", "Passphrase must contain at least one uppercase letter.")
+            return False
         if not any(char.islower() for char in passphrase):
-            QMessageBox.warning(self, "Error", "Passphrase must contain at least one lowercase letter.")
-            return
+            not test and QMessageBox.warning(self, "Error", "Passphrase must contain at least one lowercase letter.")
+            return False
         if not any(char in "!@#$%^&*()_+{}[]|\:;<>,.?/~`" for char in passphrase):
-            QMessageBox.warning(self, "Error", "Passphrase must contain at least one special character.")
-            return
+            not test and QMessageBox.warning(self, "Error", "Passphrase must contain at least one special character.")
+            return False
         if not output_location:
-            QMessageBox.warning(self, "Error", "Please enter an output location.")
-            return
+            not test and QMessageBox.warning(self, "Error", "Please enter an output location.")
+            return False
 
-        make_key(name, email, passphrase, output_location)
-
-        self.keys_generated.emit(output_location)
-        self.close()
+        self._create_key(name, email, passphrase, output_location)
 
 
 class PGP_Main(QMainWindow):
@@ -442,12 +447,9 @@ class PGP_Main(QMainWindow):
         if not text:
             if needs_pgp and not "---" in text or not needs_pgp:
 
-                if self.test_mode:
-                    self.error_window_shown.emit()
-                    return True
-                else:
-                    self.error_window.warning(self, "Error", "Nothing to copy...")
-                    return
+                self.error_window.warning(self, "Error", "Nothing to copy...")
+                return
+
         clipboard = QGuiApplication.clipboard()
         try:
             clipboard.setText(text)

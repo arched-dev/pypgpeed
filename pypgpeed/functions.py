@@ -13,15 +13,8 @@ def get_box(*args, **kwargs):
     for el in args:
         if isinstance(el, QTextEdit):
             box = el
-    if "box" in kwargs:
-        box = kwargs["box"]
+
     return box
-
-
-def validate_password(password):
-    regex = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
-    return bool(re.match(regex, password))
-
 
 def get_stored_keys(key_dir=None):
     # get the home directory path
