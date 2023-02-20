@@ -42,16 +42,12 @@ jobs:
         coverage report -m > tests/coverage.txt
         coverage-badge -o assets/coverage.svg
 
-    - name: Upload
+    - name: Commit changes
       uses: EndBug/add-and-commit@v9
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       with:
-        author_name: Lewis Morris
+        author_name: Lewis
         author_email: lewis.morris@gmail.com
-        message: "upload coverage items"
+        message: 'Coverage'
         add: |
-          tests/coverage.txt
-          assets/coverage.svg
-        force: true
+          'tests/coverage.txt'
+          'assets/coverage.svg'
