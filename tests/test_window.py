@@ -1,9 +1,11 @@
+import os.path
 import tempfile
 import time
 import unittest
 from unittest.mock import patch
 
 from PyQt6.QtCore import Qt, QCoreApplication, QObject, QEventLoop, QEvent
+from PyQt6.QtGui import QAction
 from PyQt6.QtTest import QSignalSpy, QTest
 from PyQt6.QtWidgets import QApplication, QLineEdit, QTextEdit, QPushButton, QMessageBox
 
@@ -50,7 +52,7 @@ class MyWindowTest(unittest.TestCase):
         self.person_one_pri, self.person_one_pub = make_key("person1", "person1@test.com", pass_user_one, temp_dir.name)
         self.person_two_pri, self.person_two_pub = make_key("person2", "person2@test.com", pass_user_two, temp_dir.name)
         self.app = QApplication([])
-        self.window = PGP_Main()
+        self.window = PGP_Main(True)
 
     def tearDown(self):
         self.window.close()
@@ -206,6 +208,51 @@ class MyWindowTest(unittest.TestCase):
         import pyperclip
         clipboard_text = pyperclip.paste()
         self.assertEqual(new_output_text, clipboard_text.strip())
+
+    def test_gpg_key_creation(self):
+        temp_directory = tempfile.TemporaryDirectory().name
+
+        passphrase_box = self.window.dlg.findChild(QTextEdit, "gen_passphrase_box")
+        name_box = self.window.dlg.findChild(QTextEdit, "gen_name_box")
+        email_box = self.window.dlg.findChild(QTextEdit, "gen_email_box")
+        output_location_box = self.window.dlg.findChild(QTextEdit, "gen_output_location_box")
+        generate_button = self.window.dlg.findChild(QPushButton, "gen_generate_button")
+
+        passphrase_box.setText("iuhsdf33aSDFFuisd!!")
+        name_box.setText("testuser1")
+        email_box.setText("testuser1@test.com")
+        output_location_box.setText(temp_directory)
+        generate_button.click()
+
+        pri_exists = os.path.isfile(os.path.join(temp_directory, "pri_key.key"))
+        pub_exists = os.path.isfile(os.path.join(temp_directory, "pub_key.key"))
+
+        # check if the files were created
+        self.assertTrue(pri_exists)
+        self.assertTrue(pub_exists)
+
+        #then have to do a bit of tweaking here pretend the window was open and what it does next.
+        self.window._set_key(temp_directory)
+
+        # check if the path to the keys has been update
+        self.assertEqual(self.window.key_location,  temp_directory)
+
+        #get the new keys
+        with open(os.path.join(temp_directory, "pri_key.key"), "r") as f:
+            pri_key = f.read()
+        with open(os.path.join(temp_directory, "pub_key.key"), "r") as f:
+            pub_key = f.read()
+
+        # check all the relevant fields in the parent window have been updated with the new key
+        for k, v in self.window.key_boxes.items():
+            for el in v:
+                if k == "private":
+                    self.assertEqual(el.toPlainText().strip(), pri_key.strip())
+                else:
+                    self.assertEqual(el.toPlainText().strip(), pub_key.strip())
+
+
+
 
 
     # def test_copy(self):

@@ -6,7 +6,7 @@ import pyperclip
 from PyQt6.QtCore import Qt, pyqtSignal, QTimer
 from PyQt6.QtGui import QAction, QGuiApplication
 from PyQt6.QtWidgets import QMainWindow, QTabWidget, QWidget, QVBoxLayout, QHBoxLayout, QTextEdit, QLabel, \
-    QPushButton, QMessageBox, QDialog, QDialogButtonBox, QFileDialog
+    QPushButton, QMessageBox, QDialog, QDialogButtonBox, QFileDialog, QCheckBox
 
 from pypgpeed import decrypt_message, encrypt_message, encrypt_cleartext_message, verify_message, make_key
 from pypgpeed.functions import get_stored_keys
@@ -48,24 +48,29 @@ class GenerateDialog(QDialog):
         self.passphrase_box.setTabChangesFocus(True)
         self.passphrase_box.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.passphrase_box.setFixedHeight(45)
+        self.passphrase_box.setObjectName("gen_passphrase_box")
 
         self.name_box = QTextEdit()
         self.name_box.setTabChangesFocus(True)
         self.name_box.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.name_box.setFixedHeight(45)
+        self.name_box.setObjectName("gen_name_box")
 
         self.email_box = QTextEdit()
         self.email_box.setTabChangesFocus(True)
         self.email_box.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.email_box.setFixedHeight(45)
+        self.email_box.setObjectName("gen_email_box")
 
         self.output_location_box = QTextEdit()
         self.output_location_box.setTabChangesFocus(True)
         self.output_location_box.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.output_location_box.setText(os.path.expanduser('~' + "/pgp_keys"))
         self.output_location_box.setFixedHeight(45)
+        self.output_location_box.setObjectName("gen_output_location_box")
 
         generate_button = QPushButton("Generate")
+        generate_button.setObjectName("gen_generate_button")
         generate_button.clicked.connect(lambda: self.generate_key_validation())
 
         # Add widgets to layout
@@ -137,6 +142,9 @@ class PGP_Main(QMainWindow):
         self.error_window = QMessageBox()
         self.error_window.setObjectName("error_window")
 
+        # Creates an instance of the GenerateDialog window, need this here as need to access with unittests
+        self.dlg = GenerateDialog(self)
+
         menubar = self.menuBar()
 
         # file menu bar
@@ -145,6 +153,8 @@ class PGP_Main(QMainWindow):
         # geneate new keys dialogue open
         generate_menu = QAction('Generate New Keys', self)
         generate_menu.triggered.connect(self.generate_show)
+        generate_menu.setObjectName("generate_menu")
+
         file_menu.addAction(generate_menu)
 
         # set key location open
@@ -249,6 +259,7 @@ class PGP_Main(QMainWindow):
         self.decrypt_tab.setLayout(decrypt_layout)
 
         # Create widgets for "ENCRYPT" tab
+
         encrypt_message_box = QTextEdit()
         encrypt_message_box.setTabChangesFocus(True)
         encrypt_message_box.setObjectName("encrypt_message_box")
@@ -491,18 +502,20 @@ class PGP_Main(QMainWindow):
         webbrowser.open(url)
 
     def generate_show(self):
-        # Creates an instance of the GenerateDialog window
-        dlg = GenerateDialog(self)
         # Connects the key_generated signal from the GenerateDialog to the on_key_generated slot of the parent window
-        dlg.keys_generated.connect(self._set_key)
+        self.dlg.keys_generated.connect(self._set_key)
         # Executes the GenerateDialog window
-        dlg.exec()
+        self.dlg.exec()
         # Runs the setup_keys function after the GenerateDialog window is closed
 
     def _set_key(self, location):
         # Sets the key_location attribute to the specified location
+
         self.key_location = location
-        QMessageBox.information(self, "Keys generated", "New keys have been generated.")
+
+        if not self.test_mode:
+            QMessageBox.information(self, "Keys generated", "New keys have been generated.")
+
         self.setup_keys(True)
 
     def set_key_location(self):
