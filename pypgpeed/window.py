@@ -3,7 +3,7 @@ import re
 import webbrowser
 
 import pyperclip
-from PyQt6.QtCore import Qt, pyqtSignal, QTimer
+from PyQt6.QtCore import Qt, pyqtSignal, QTimer, QThread
 from PyQt6.QtGui import QAction, QGuiApplication
 from PyQt6.QtWidgets import QMainWindow, QTabWidget, QWidget, QVBoxLayout, QHBoxLayout, QTextEdit, QLabel, \
     QPushButton, QMessageBox, QDialog, QDialogButtonBox, QFileDialog, QCheckBox
@@ -232,7 +232,7 @@ class PGP_Main(QMainWindow):
         copy_button_decrypt.clicked.connect(
             lambda: self.copy_text(decrypt_output_box, copy_button_decrypt, True))
         copy_button_decrypt.setProperty('class', 'success')
-        self.copy_buttons.append(copy_button_decrypt)
+        self.copy_buttons.append([decrypt_output_box, copy_button_decrypt])
 
         decrypt_button = QPushButton("Generate")
         decrypt_button.setProperty('class', 'warning')
@@ -289,7 +289,7 @@ class PGP_Main(QMainWindow):
         copy_button_encrypt.clicked.connect(
             lambda: self.copy_text(encrypt_output_box, copy_button_encrypt))
         copy_button_encrypt.setProperty('class', 'success')
-        self.copy_buttons.append(copy_button_encrypt)
+        self.copy_buttons.append([encrypt_output_box, copy_button_encrypt])
         copy_button_encrypt.setObjectName("copy_button_encrypt")
 
 
@@ -347,7 +347,7 @@ class PGP_Main(QMainWindow):
         copy_button_sign.clicked.connect(
             lambda: self.copy_text(sign_output_box, copy_button_sign))
         copy_button_sign.setProperty('class', 'success')
-        self.copy_buttons.append(copy_button_sign)
+        self.copy_buttons.append([sign_output_box, copy_button_sign])
         copy_button_sign.setObjectName("copy_button_sign")
 
 
@@ -403,7 +403,7 @@ class PGP_Main(QMainWindow):
         copy_button_verify.clicked.connect(
             lambda: self.copy_text(verify_output_box, copy_button_verify))
         copy_button_verify.setProperty('class', 'success')
-        self.copy_buttons.append(copy_button_verify)
+        self.copy_buttons.append([verify_output_box, copy_button_verify])
         copy_button_verify.setObjectName("copy_button_verify")
 
         verify_button = QPushButton("Generate")
@@ -446,9 +446,8 @@ class PGP_Main(QMainWindow):
         text = textbox.toPlainText()
         if not text:
             if needs_pgp and not "---" in text or not needs_pgp:
-
-                self.error_window.warning(self, "Error", "Nothing to copy...")
-                return
+                not self.test_mode and self.error_window.warning(self, "Error", "Nothing to copy...")
+                return True
 
         clipboard = QGuiApplication.clipboard()
         try:

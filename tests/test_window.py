@@ -39,9 +39,11 @@ class MyWindowTest(unittest.TestCase):
 
     def tearDown(self):
         self.window.close()
+        self.window.dlg.close()
         self.app.quit()
-
+    #
     def test_encrypt(self):
+        print("tetsing encryption")
         message = "Heyy"
 
         # get elements
@@ -75,6 +77,7 @@ class MyWindowTest(unittest.TestCase):
         self.assertIn('-----BEGIN PGP MESSAGE-----', clipboard_text)
 
     def test_decrypt(self):
+        print("tetsing decryption")
         # create a message to send
         send_message = 'This is a test!'
         #person1 encrypt message
@@ -100,6 +103,8 @@ class MyWindowTest(unittest.TestCase):
 
         # click the button to encrypt
         decrypt_button.click()
+
+
         #wait for the field to change - also track times its checked
         new_output_text = wait_for_val(self, out_text, decrypt_output_box)
         # get the new output text
@@ -128,6 +133,7 @@ class MyWindowTest(unittest.TestCase):
 
 
     def test_sign(self):
+        print("tetsing sign ")
 
         message = "This is me"
 
@@ -162,6 +168,8 @@ class MyWindowTest(unittest.TestCase):
         self.assertEqual(sign_output_box.toPlainText().strip(), clipboard_text.strip())
 
     def test_verify(self):
+        print("tetsing verify")
+
         message = "This is me"
 
         verify_message_box = self.window.findChild(QTextEdit, "verify_message_box")
@@ -192,6 +200,8 @@ class MyWindowTest(unittest.TestCase):
         self.assertEqual(new_output_text, clipboard_text.strip())
 
     def test_gpg_key_creation(self):
+        print("tetsing gpg key ")
+
         temp_directory = tempfile.TemporaryDirectory().name
 
         passphrase_box = self.window.dlg.findChild(QTextEdit, "gen_passphrase_box")
@@ -234,14 +244,14 @@ class MyWindowTest(unittest.TestCase):
                     self.assertEqual(el.toPlainText().strip(), pub_key.strip())
 
     def test_key_fail(self):
+        print("tetsing fail")
+
         """ checks to make sure the validation on the key creation is working correctly """
 
         passphrase_box = self.window.dlg.findChild(QTextEdit, "gen_passphrase_box")
         name_box = self.window.dlg.findChild(QTextEdit, "gen_name_box")
         email_box = self.window.dlg.findChild(QTextEdit, "gen_email_box")
         output_location_box = self.window.dlg.findChild(QTextEdit, "gen_output_location_box")
-
-
 
         # no name
         name_box.setText("")
@@ -288,25 +298,31 @@ class MyWindowTest(unittest.TestCase):
         output_location_box.setText("")
         self.assertFalse(self.window.dlg.generate_key_validation(True))
 
+        self.window.dlg.close()
+
     def test_copy(self):
+        print("tetsing copy")
+
         """ checks to make sure the button doesn't copy when its blank """
         self.error=False
 
-        def copy_text(textbox, copyButton, needs_pgp=True):
-            # Copy the text from the text box to the clipboard
-            text = textbox.toPlainText()
-            if not text:
-                if needs_pgp and not "---" in text or not needs_pgp:
-                    self.error = True
+        # def copy_text(textbox, copyButton, needs_pgp=True):
+        #     # Copy the text from the text box to the clipboard
+        #     text = textbox.toPlainText()
+        #     if not text:
+        #         if needs_pgp and not "---" in text or not needs_pgp:
+        #             self.error = True
+        # #             return
+        # #
+        # #monkey patch
+        # setattr(self.window, "copy_text", copy_text)
 
-        #monkey patch
-        setattr(self.window, "copy_text", copy_text)
-
-        for button in self.window.copy_buttons:
+        for textbox, button in self.window.copy_buttons:
             # click the moneykey patched button
-            button.click()
+            error = self.window.copy_text(textbox, button)
             # assert that the error dialog was opened and closed
-            self.assertTrue(self.error)
+            self.assertTrue(error)
+            self.window.error_window.close()
 
 if __name__ == '__main__':
     unittest.main()
