@@ -39,5 +39,30 @@ jobs:
         DISPLAY: ':99.0'
       run: |
         xvfb-run --auto-servernum coverage run --source=pypgpeed -m unittest discover -s tests
+        coverage report -m > tests/coverage.txt
+        coverage-badge -o assets/coverage.svg
+        cp tests/coverage.txt "${{github.workspace}}/assets/coverage.txt"
+        cp assets/coverage.svg "${{github.workspace}}/assets/coverage.svg"
+        cp tests/coverage.txt "${{github.workspace}}/pypgpeed/assets/coverage.txt"
+        cp assets/coverage.svg "${{github.workspace}}/pypgpeed/assets/coverage.svg"
+
+    - name: Upload
+      uses: EndBug/add-and-commit@v9
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      with:
+        author_name: Lewis Morris
+        author_email: lewis.morris@gmail.com
+        message: "upload coverage items"
+        add: |
+          tests/coverage.txt
+          assets/coverage.svg
+        force: true
+
+      run: |
+        xvfb-run --auto-servernum coverage run --source=pypgpeed -m unittest discover -s tests
         coverage report -m > ${{github.workspace}}/tests/coverage.txt
         coverage-badge -o ${{github.workspace}}/assets/coverage.svg
+        mv tests/coverage.txt "${{github.workspace}}/{project_path}/assets/"
+        mv assets/coverage.svg "${{github.workspace}}/{project_path}/assets/"
