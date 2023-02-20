@@ -39,13 +39,5 @@ jobs:
         DISPLAY: ':99.0'
       run: |
         xvfb-run --auto-servernum coverage run --source=pypgpeed -m unittest discover -s tests
-        coverage report -m > coverage.txt
-        coverage-badge -o coverage.svg
-
-    - name: Upload coverage files
-      uses: actions/upload-artifact@v2
-      with:
-        name: Coverage Files
-        path: |
-          coverage.txt
-          coverage.svg
+        coverage report -m > ${{github.workspace}}/tests/coverage.txt
+        coverage-badge -o ${{github.workspace}}/assets/coverage.svg
