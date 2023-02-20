@@ -10,6 +10,9 @@ from PyQt6.QtWidgets import QApplication, QLineEdit, QTextEdit, QPushButton, QMe
 from pypgpeed import make_key, encrypt_message, decrypt_message, encrypt_cleartext_message, verify_message as vf_msg, \
     PGP_Main
 
+pass_user_one = "TeStPaSs1!"
+pass_user_two = "TeStPaSs2!"
+
 def wait_for_val(test, old_val, box):
     # wait for the field to change - also track times its checked
     times = 0
@@ -44,8 +47,8 @@ class DialogEventFilter(QObject):
 class MyWindowTest(unittest.TestCase):
     def setUp(self):
         temp_dir = tempfile.TemporaryDirectory()
-        self.person_one_pri, self.person_one_pub = make_key("person1", "person1@test.com", "TeStPaSs1!", temp_dir.name)
-        self.person_two_pri, self.person_two_pub = make_key("person2", "person2@test.com", "TeStPaSs2!", temp_dir.name)
+        self.person_one_pri, self.person_one_pub = make_key("person1", "person1@test.com", pass_user_one, temp_dir.name)
+        self.person_two_pri, self.person_two_pub = make_key("person2", "person2@test.com", pass_user_two, temp_dir.name)
         self.app = QApplication([])
         self.window = PGP_Main()
 
@@ -103,7 +106,7 @@ class MyWindowTest(unittest.TestCase):
 
         decrypt_message_box.setText(encrypted_message)
         decrypt_private_key_box.setText(self.person_two_pri)
-        decrypt_pass_box.setText("TeStPaSs2!")
+        decrypt_pass_box.setText(pass_user_two)
 
         # get the output text
         out_text = decrypt_output_box.toPlainText()
@@ -154,7 +157,7 @@ class MyWindowTest(unittest.TestCase):
 
         sign_message_box.setText(message)
         sign_private_key_box.setText(self.person_one_pri)
-        sign_passphrase_box.setText("TeStPaSs1!")
+        sign_passphrase_box.setText(pass_user_one)
 
 
         out_text = sign_output_box.toPlainText()
@@ -183,7 +186,7 @@ class MyWindowTest(unittest.TestCase):
         copy_button_verify = self.window.findChild(QPushButton, "copy_button_verify")
         verify_button = self.window.findChild(QPushButton, "verify_button")
 
-        signed_mess = encrypt_cleartext_message(message, self.person_one_pri, "TeStPaSs1!")
+        signed_mess = encrypt_cleartext_message(message, self.person_one_pri, pass_user_one)
 
         verify_message_box.setText(signed_mess)
         verify_public_key_box.setText(self.person_one_pub)
