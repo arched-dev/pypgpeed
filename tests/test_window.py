@@ -180,12 +180,12 @@ class MyWindowTest(unittest.TestCase):
         verify_message_box = self.window.findChild(QTextEdit, "verify_message_box")
         verify_public_key_box = self.window.findChild(QTextEdit, "verify_public_key_box")
         verify_output_box = self.window.findChild(QTextEdit, "verify_output_box")
-        copy_button_verify = self.window.findChild(QTextEdit, "copy_button_verify")
+        copy_button_verify = self.window.findChild(QPushButton, "copy_button_verify")
         verify_button = self.window.findChild(QPushButton, "verify_button")
 
         signed_mess = encrypt_cleartext_message(message, self.person_one_pri, "TeStPaSs1!")
 
-        verify_message_box.setText(message)
+        verify_message_box.setText(signed_mess)
         verify_public_key_box.setText(self.person_one_pub)
 
         out_text = verify_output_box.toPlainText()
