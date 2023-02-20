@@ -39,7 +39,7 @@ jobs:
         DISPLAY: ':99.0'
       run: |
         xvfb-run --auto-servernum coverage run --source=pypgpeed -m unittest discover -s tests
-        coverage report -m > tests/coverage.txt
+        coverage report -m > coverage.txt
         rm coverage.svg
         coverage-badge -o coverage.svg
 
@@ -50,6 +50,6 @@ jobs:
         author_name: Lewis
         author_email: lewis.morris@gmail.com
         message: "Update coverage"
-        add: "coverage.txt, coverage.svg"
-        force: "true"
+        add: "coverage.txt, coverage.svg --force"
+        cwd: './assets/'
         token: ${{ secrets.GITHUB_TOKEN }}
