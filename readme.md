@@ -4,6 +4,7 @@
 
 [![Tests](https://github.com/lewis-morris/pypgpeed/actions/workflows/python-app.yml/badge.svg)](https://github.com/lewis-morris/pypgpeed/actions/workflows/python-app.yml)
 [![PyPI version](https://badge.fury.io/py/pypgpeed.svg)](https://badge.fury.io/py/pypgpeed)
+[![Coverage Badge](assets/coverage.svg)]()
 
 Create pgp keys, encrypt and decrypt messages, sign messages and verify messages.
 
