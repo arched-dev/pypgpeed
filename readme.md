@@ -10,11 +10,11 @@ Create pgp keys, encrypt and decrypt messages, sign messages and verify messages
 
 Perfect for the novice to begin secure communication online.
 
-<p align="center">
-    <span>Example of GUI</span>
 
-    <img src="assets/example.png" width=60% height=50%>
-</p>
+**Example of GUI:**
+
+![example gui image](assets/example.png)
+
 
 ## Usage - if you don't have python or don't even know what that is.
 
