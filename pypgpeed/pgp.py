@@ -181,11 +181,9 @@ def verify_message(text, in_key, box=None):
     try:
         key_out = in_key.verify(message)
         if key_out.__bool__():
-            if box:
-                box.setText("Message verified... It was created by the owner of this public key.")
-            else:
-                return True
-    finally:
+            box and box.setText("Message verified... It was created by the owner of this public key.")
+            return True
+    except:
         return False
 
 
