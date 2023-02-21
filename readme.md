@@ -63,3 +63,13 @@ them by choosing their containing directory with `file >> Set Key Location`, ple
 called `pri_key.key` and `pub_key.key`  
 
 The rest is self explanatory...
+
+
+## Todo
+
+- [ ] Sign & encrypt messages in one pass.
+- [ ] Create config file that is stores user prefs if needed (non-mandatory)
+- [ ] sign files
+- [ ] store multiple signatures?
+- [ ] sub keys and revoking etc?
+
