@@ -13,7 +13,8 @@ Perfect for the novice to begin secure communication online.
 
 **Example of GUI:**
 
-![example gui image](assets/example.png)
+<img src="assets/example.png" width=60% height=50%>
+
 
 ## Usage - if you don't have python or don't even know what that is.
 
