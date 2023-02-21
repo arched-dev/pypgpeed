@@ -11,10 +11,13 @@ Create pgp keys, encrypt and decrypt messages, sign messages and verify messages
 Perfect for the novice to begin secure communication online.
 
 
-**Example of GUI:**
+net use z: \\3.0.0.113\Documents /u:colemanbros Popuiyt919
 
-<img src="assets/example.png" width=60% height=50%>
+<p align="center">
+    <span>Example of GUI</span>
 
+    <img src="assets/example.png" width=60% height=50%>
+</p>
 
 ## Usage - if you don't have python or don't even know what that is.
 
