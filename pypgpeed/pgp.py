@@ -51,13 +51,11 @@ def check_text_and_key(func):
             # Set the text of the box argument to an error message and return
             box.setText("Message Blank")
             return
-
         # Check if the key is provided
         if in_key is None or in_key == "":
             # Set the text of the box argument to an error message and return
             box.setText("Key Error")
             return
-
         # Convert the key from blob format to a PGPKey object
         in_key, _ = PGPKey.from_blob(in_key.strip())
 
@@ -80,13 +78,13 @@ def unlock_passphrase(func):
 
         try:
             # Unlock the key with the passphrase
-            with in_key.unlock(passphrase) as f:
+            with in_key.unlock(passphrase):
                 # Convert the key from blob format to a PGPKey object
                 # in_key = PGPKey.from_blob(in_key.strip())
                 # Call the original function with the given arguments and return its result
                 return func(text, in_key, passphrase, *args, **kwargs)
 
-        except Exception as e:
+        except:
             # Set the text of the box object to an error message and return
             if box:
                 box.setText("Passphrase Error")
@@ -187,7 +185,7 @@ def verify_message(text, in_key, box=None):
                 box.setText("Message verified... It was created by the owner of this public key.")
             else:
                 return True
-    except:
+    finally:
         return False
 
 

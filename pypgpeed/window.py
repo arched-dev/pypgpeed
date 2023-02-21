@@ -11,6 +11,8 @@ from PyQt6.QtWidgets import QMainWindow, QTabWidget, QWidget, QVBoxLayout, QHBox
 from pypgpeed import decrypt_message, encrypt_message, encrypt_cleartext_message, verify_message, make_key
 from pypgpeed.functions import get_stored_keys
 
+copy_text = "Copy Text"
+output_text = "Output:"
 
 class AboutDialog(QDialog):
     def __init__(self, parent=None):
@@ -97,6 +99,10 @@ class GenerateDialog(QDialog):
         self.close()
 
     def generate_key_validation(self, test=False):
+        def show_error(msg):
+            if not test:
+                QMessageBox.warning(self, "Error", msg)
+
         # Get the values from the text boxes
         name = self.name_box.toPlainText().strip()
         email = self.email_box.toPlainText().strip()
@@ -105,38 +111,47 @@ class GenerateDialog(QDialog):
 
         # Check if the values are valid
         if not name:
-            not test and QMessageBox.warning(self, "Error", "Please enter a name.")
+            show_error("Please enter a name.")
             return False
-        if not len(name) > 5:
-            not test and QMessageBox.warning(self, "Error", "Please enter a longer name.")
+
+        if len(name) <= 5:
+            show_error("Please enter a longer name.")
             return False
+
         if not email:
-            not test and QMessageBox.warning(self, "Error", "Please enter an email address.")
+            show_error("Please enter an email address.")
             return False
+
         if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
-            not test and QMessageBox.warning(self, "Error", "Please enter a valid email address.")
+            show_error("Please enter a valid email address.")
             return False
+
         if not passphrase:
-            not test and QMessageBox.warning(self, "Error", "Please enter a passphrase.")
+            show_error("Please enter a passphrase.")
             return False
+
         if len(passphrase) < 8:
-            not test and QMessageBox.warning(self, "Error", "Passphrase must be at least 8 characters long.")
+            show_error("Passphrase must be at least 8 characters long.")
             return False
+
         if not any(char.isupper() for char in passphrase):
-            not test and QMessageBox.warning(self, "Error", "Passphrase must contain at least one uppercase letter.")
+            show_error("Passphrase must contain at least one uppercase letter.")
             return False
+
         if not any(char.islower() for char in passphrase):
-            not test and QMessageBox.warning(self, "Error", "Passphrase must contain at least one lowercase letter.")
+            show_error("Passphrase must contain at least one lowercase letter.")
             return False
+
         if not any(char in "!@#$%^&*()_+{}[]|\:;<>,.?/~`" for char in passphrase):
-            not test and QMessageBox.warning(self, "Error", "Passphrase must contain at least one special character.")
+            show_error("Passphrase must contain at least one special character.")
             return False
+
         if not output_location:
-            not test and QMessageBox.warning(self, "Error", "Please enter an output location.")
+            show_error("Please enter an output location.")
             return False
 
         self._create_key(name, email, passphrase, output_location)
-
+        return True
 
 class PGP_Main(QMainWindow):
     error_window_shown = pyqtSignal()
@@ -227,7 +242,7 @@ class PGP_Main(QMainWindow):
         decrypt_widget = QWidget()
         decrypt_hbox = QHBoxLayout(decrypt_widget)
 
-        copy_button_decrypt = QPushButton("Copy Text")
+        copy_button_decrypt = QPushButton(copy_text)
         copy_button_decrypt.setObjectName("copy_button_decrypt")
         copy_button_decrypt.clicked.connect(
             lambda: self.copy_text(decrypt_output_box, copy_button_decrypt, True))
@@ -255,12 +270,10 @@ class PGP_Main(QMainWindow):
         decrypt_layout.addWidget(decrypt_private_key_box)
         decrypt_layout.addWidget(QLabel("Your Passphrase:"))
         decrypt_layout.addWidget(decrypt_pass_box)
-        decrypt_layout.addWidget(QLabel("Output:"))
+        decrypt_layout.addWidget(QLabel(output_text))
         decrypt_layout.addWidget(decrypt_output_box)
         decrypt_layout.addWidget(decrypt_widget)
 
-        # decrypt_layout.addWidget(copy_button_decrypt)
-        # decrypt_layout.addWidget(decrypt_button)
         self.decrypt_tab.setLayout(decrypt_layout)
 
         # Create widgets for "ENCRYPT" tab
@@ -285,7 +298,7 @@ class PGP_Main(QMainWindow):
         encrypt_widget = QWidget()
         encrypt_hbox = QHBoxLayout(encrypt_widget)
 
-        copy_button_encrypt = QPushButton("Copy Text")
+        copy_button_encrypt = QPushButton(copy_text)
         copy_button_encrypt.clicked.connect(
             lambda: self.copy_text(encrypt_output_box, copy_button_encrypt))
         copy_button_encrypt.setProperty('class', 'success')
@@ -311,11 +324,9 @@ class PGP_Main(QMainWindow):
         encrypt_layout.addWidget(encrypt_message_box)
         encrypt_layout.addWidget(QLabel("Their Public Key:"))
         encrypt_layout.addWidget(encrypt_public_key_box)
-        encrypt_layout.addWidget(QLabel("Output:"))
+        encrypt_layout.addWidget(QLabel(output_text))
         encrypt_layout.addWidget(encrypt_output_box)
         encrypt_layout.addWidget(encrypt_widget)
-        # encrypt_layout.addWidget(copy_button_encrypt)
-        # encrypt_layout.addWidget(encrypt_button)
 
         self.encrypt.setLayout(encrypt_layout)
 
@@ -343,7 +354,7 @@ class PGP_Main(QMainWindow):
         sign_widget = QWidget()
         sign_hbox = QHBoxLayout(sign_widget)
 
-        copy_button_sign = QPushButton("Copy Text")
+        copy_button_sign = QPushButton(copy_text)
         copy_button_sign.clicked.connect(
             lambda: self.copy_text(sign_output_box, copy_button_sign))
         copy_button_sign.setProperty('class', 'success')
@@ -372,11 +383,11 @@ class PGP_Main(QMainWindow):
         sign_layout.addWidget(sign_private_key_box)
         sign_layout.addWidget(QLabel("Your Passphrase:"))
         sign_layout.addWidget(sign_passphrase_box)
-        sign_layout.addWidget(QLabel("Output:"))
+        sign_layout.addWidget(QLabel(output_text))
         sign_layout.addWidget(sign_output_box)
         sign_layout.addWidget(sign_widget)
-        # sign_layout.addWidget(copy_button_sign)
-        # sign_layout.addWidget(sign_button)
+
+
         self.sign_tab.setLayout(sign_layout)
 
         # Create widgets for "VERIFY" tab
@@ -399,7 +410,7 @@ class PGP_Main(QMainWindow):
         verify_widget = QWidget()
         verify_hbox = QHBoxLayout(verify_widget)
 
-        copy_button_verify = QPushButton("Copy Text")
+        copy_button_verify = QPushButton(copy_text)
         copy_button_verify.clicked.connect(
             lambda: self.copy_text(verify_output_box, copy_button_verify))
         copy_button_verify.setProperty('class', 'success')
@@ -424,11 +435,11 @@ class PGP_Main(QMainWindow):
         verify_layout.addWidget(verify_message_box)
         verify_layout.addWidget(QLabel("Their Public Key:"))
         verify_layout.addWidget(verify_public_key_box)
-        verify_layout.addWidget(QLabel("Output:"))
+        verify_layout.addWidget(QLabel(output_text))
         verify_layout.addWidget(verify_output_box)
         verify_layout.addWidget(verify_widget)
-        # verify_layout.addWidget(copy_button_verify)
-        # verify_layout.addWidget(verify_button)
+
+
         self.verify_tab.setLayout(verify_layout)
 
         # Set main layout and add tabs
@@ -466,9 +477,8 @@ class PGP_Main(QMainWindow):
 
     def _return_box_to_normal(self):
         for box in self.copy_buttons:
-            # Change the button text back to "Copy Text"
-            box.setText("Copy Text")
-
+            # Change the button text back to copy_text
+            box.setText(copy_text)
 
     def setup_keys(self, check=False):
         """adds the private and public keys to the window."""
@@ -479,8 +489,9 @@ class PGP_Main(QMainWindow):
             msg_box.setWindowTitle("Keys Error")
             msg_box.setText(
                 f"Either the public key, or private key is not found in {self.key_location}, make sure the files are named 'pub_key.key' & 'pri_key.key'")
-            msg_box.exec()
-            return
+            # only show on run
+            not self.test_mode and msg_box.exec()
+            return False
 
         # loop items with pri or public keys
         for k, v in self.key_boxes.items():
@@ -489,12 +500,13 @@ class PGP_Main(QMainWindow):
                     el.setText(pri.strip())
                 else:
                     el.setText(pub.strip())
+        return True
 
     def help_show(self):
         # Creates an instance of the AboutDialog window
-        dlg = AboutDialog(self)
+        self.helpdlg = AboutDialog(self)
         # Executes the AboutDialog window
-        dlg.exec()
+        not self.test_mode and self.helpdlg.exec()
 
     def home_show(self):
         # Defines a URL to be opened in the default web browser
@@ -524,6 +536,3 @@ class PGP_Main(QMainWindow):
         if loc:
             self.key_location = loc
             self.setup_keys(True)
-
-
-
