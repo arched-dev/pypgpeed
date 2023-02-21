@@ -10,9 +10,6 @@ Create pgp keys, encrypt and decrypt messages, sign messages and verify messages
 
 Perfect for the novice to begin secure communication online.
 
-
-net use z: \\3.0.0.113\Documents /u:colemanbros Popuiyt919
-
 <p align="center">
     <span>Example of GUI</span>
 
