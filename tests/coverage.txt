@@ -1,9 +1,9 @@
 Name                    Stmts   Miss  Cover   Missing
 -----------------------------------------------------
 pypgpeed/__init__.py        3      0   100%
-pypgpeed/functions.py      43      2    95%   55-56
-pypgpeed/pgp.py            76      4    95%   52-53, 57-58
+pypgpeed/functions.py      41      0   100%
+pypgpeed/pgp.py            80      0   100%
 pypgpeed/run.py            18      4    78%   17-19, 23
 pypgpeed/window.py        356     19    95%   104, 130-131, 150-151, 467-469, 479-481, 513-515, 519-521, 530, 535-538
 -----------------------------------------------------
-TOTAL                     496     29    94%
+TOTAL                     498     23    95%
