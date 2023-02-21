@@ -46,7 +46,82 @@ class MyWindowTest(unittest.TestCase):
             self.window.close()
             self.window.dlg.close()
             self.app.quit()
-    #
+
+    def test_blank(self):
+        """Tests the the output box correctly displays error messages"""
+
+        message = ""
+
+        # get elements
+        encrypt_button = self.window.findChild(QPushButton, "encrypt_button")
+        encrypt_output_box = self.window.findChild(QTextEdit, "encrypt_output_box")
+        encrypt_public_key_box = self.window.findChild(QTextEdit, "encrypt_public_key_box")
+        encrypt_message_box = self.window.findChild(QTextEdit, "encrypt_message_box")
+
+        # set the message to be encrypted
+        encrypt_message_box.setText(message)
+        # set the encryption box public key
+        encrypt_public_key_box.setText(self.person_two_pub)
+        #get the output text
+        out_text = encrypt_output_box.toPlainText()
+        #click the button to encrypt
+        encrypt_button.click()
+        #wait for the field to change - also track times its checked
+        new_output_text = wait_for_val(self, out_text, encrypt_output_box)
+
+        #get the new output text
+        self.assertEqual(new_output_text, 'Message Blank')
+
+    def test_key_error(self):
+        """Tests the output box correctly displays error messages on invalid key"""
+
+        message = "test"
+
+        # get elements
+        encrypt_button = self.window.findChild(QPushButton, "encrypt_button")
+        encrypt_output_box = self.window.findChild(QTextEdit, "encrypt_output_box")
+        encrypt_public_key_box = self.window.findChild(QTextEdit, "encrypt_public_key_box")
+        encrypt_message_box = self.window.findChild(QTextEdit, "encrypt_message_box")
+
+        # set the message to be encrypted
+        encrypt_message_box.setText(message)
+        # set the encryption box public key
+        encrypt_public_key_box.setText("Not a valid key")
+        # get the output text
+        out_text = encrypt_output_box.toPlainText()
+        # click the button to encrypt
+        encrypt_button.click()
+        # wait for the field to change - also track times its checked
+        new_output_text = wait_for_val(self, out_text, encrypt_output_box)
+
+        # get the new output text
+        self.assertEqual(new_output_text.strip(), 'Key invalid - please enter a valid key')
+
+    def test_key_blank(self):
+        """Tests the output box correctly displays error messages on blank"""
+
+        message = "test"
+
+        # get elements
+        encrypt_button = self.window.findChild(QPushButton, "encrypt_button")
+        encrypt_output_box = self.window.findChild(QTextEdit, "encrypt_output_box")
+        encrypt_public_key_box = self.window.findChild(QTextEdit, "encrypt_public_key_box")
+        encrypt_message_box = self.window.findChild(QTextEdit, "encrypt_message_box")
+
+        # set the message to be encrypted
+        encrypt_message_box.setText(message)
+        # set the encryption box public key
+        encrypt_public_key_box.setText("")
+        # get the output text
+        out_text = encrypt_output_box.toPlainText()
+        # click the button to encrypt
+        encrypt_button.click()
+        # wait for the field to change - also track times its checked
+        new_output_text = wait_for_val(self, out_text, encrypt_output_box)
+
+        # get the new output text
+        self.assertEqual(new_output_text.strip(), 'Key blank - please enter a valid key')
+
     def test_encrypt(self):
         """Tests encrypting a message"""
 

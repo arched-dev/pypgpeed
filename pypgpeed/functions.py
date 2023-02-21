@@ -52,9 +52,6 @@ def make_directory(path):
     except FileExistsError:
         # directory already exists
         pass
-    except Exception as e:
-        print(f"An error occurred while creating the directory: {str(e)}")
-
 
 def set_logo(app):
     svg_data = """

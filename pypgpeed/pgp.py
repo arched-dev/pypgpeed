@@ -54,10 +54,14 @@ def check_text_and_key(func):
         # Check if the key is provided
         if in_key is None or in_key == "":
             # Set the text of the box argument to an error message and return
-            box.setText("Key Error")
+            box.setText("Key blank - please enter a valid key")
             return
-        # Convert the key from blob format to a PGPKey object
-        in_key, _ = PGPKey.from_blob(in_key.strip())
+        try:
+            # Convert the key from blob format to a PGPKey object
+            in_key, _ = PGPKey.from_blob(in_key.strip())
+        except ValueError:
+            box.setText("Key invalid - please enter a valid key")
+            return
 
         # Call the original function with the given arguments and return its result
         return func(text, in_key, *args, **kwargs)
