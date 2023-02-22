@@ -88,7 +88,13 @@ def unlock_passphrase(func):
                 # Call the original function with the given arguments and return its result
                 return func(text, in_key, passphrase, *args, **kwargs)
 
-        except:
+        except ValueError:
+            if box:
+                box.setText("Message not PGP error (possibly plain text)")
+            else:
+                return False
+
+        except Exception as e:
             # Set the text of the box object to an error message and return
             if box:
                 box.setText("Passphrase Error")

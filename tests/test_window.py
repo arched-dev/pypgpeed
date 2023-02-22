@@ -225,6 +225,20 @@ class MyWindowTest(unittest.TestCase):
         # get the new output text
         self.assertEqual(new_output_text, "You have not supplied a passphrase")
 
+        # check Fails decrypts on not PGP message
+        # check Fails decrypts on not PGP message
+
+        decrypt_pass_box.setText(pass_user_two)
+        decrypt_private_key_box.setText(self.person_two_pri)
+        decrypt_message_box.setText("Test Message")
+        decrypt_button.click()
+
+        out_text = ""
+
+        #wait for the field to change - also track times its checked
+        new_output_text = wait_for_val(self, out_text, decrypt_output_box)
+        # get the new output text
+        self.assertEqual(new_output_text, "Message not PGP error (possibly plain text)")
 
     def test_sign(self):
         """Tests signing a message"""
