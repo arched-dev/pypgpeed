@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='pypgpeed',
-    version='0.1.2',
+    version='0.1.3',
     packages=['pypgpeed'],
     entry_points = {
         'console_scripts': ['pypgpeed=pypgpeed.run:run'],

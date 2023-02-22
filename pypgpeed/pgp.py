@@ -162,10 +162,17 @@ def decrypt_message(text="", in_key=None, passphrase=None, box=None):
     """
     message = PGPMessage.from_blob(text.strip())
     decrypted = in_key.decrypt(message)
-    if box:
-        box.setText(str(decrypted.message))
+
+    # sometimes returns a bytearray and not sure why. But this will fix.
+    if hasattr(decrypted.message, "decode"):
+        message = str(decrypted.message.decode())
     else:
-        return str(decrypted.message)
+        message = str(decrypted.message)
+
+    if box:
+        box.setText(message)
+    else:
+        return message
 
 
 
