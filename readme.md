@@ -19,7 +19,7 @@ Perfect for the novice to begin secure communication online.
 ## Usage - if you don't have python or don't even know what that is.
 
 > ### Windows
-> Just click [here](https://drive.google.com/u/0/uc?id=1s_dl9kKAeAH3qqE243vIbR3dvXY8ORYw&export=download) and run. It's a hefty file like this... but it is what it is.
+> Just click [here](https://drive.google.com/file/d/1McAgn_lfv48im9Etnm3DPdRSZATyyb2j/view?export=download) and run. It's a hefty file like this... but it is what it is.
 > 
 > ### Linux
 > Come on what are you playing at ... read below.
