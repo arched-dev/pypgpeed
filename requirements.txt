@@ -1,5 +1,12 @@
-PyQt6~=6.4.2
-PGPy~=0.6.0
-setuptools~=66.0.0
-qt_material~=2.14
-pyperclip
+cffi==1.16.0
+cryptography==41.0.5
+Jinja2==3.1.2
+MarkupSafe==2.1.3
+PGPy==0.6.0
+pyasn1==0.5.0
+pycparser==2.21
+pyperclip==1.8.2
+PyQt6==6.4.2
+PyQt6-Qt6==6.6.0
+PyQt6-sip==13.6.0
+qt-material==2.14
