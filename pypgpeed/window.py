@@ -1,3 +1,4 @@
+import configparser
 import os
 import re
 import webbrowser
@@ -10,6 +11,50 @@ from PyQt6.QtWidgets import QMainWindow, QTabWidget, QWidget, QVBoxLayout, QHBox
 
 from pypgpeed import decrypt_message, encrypt_message, encrypt_cleartext_message, verify_message, make_key
 from pypgpeed.functions import get_stored_keys
+
+
+class Settings:
+    def __init__(self, ini_path):
+        # Ensure the path ends with .ini (if that's preferred)
+        if not ini_path.endswith(".ini"):
+            ini_path += ".ini"
+
+        self.ini_path = ini_path
+        self.config = configparser.ConfigParser()
+
+        if os.path.exists(self.ini_path):
+            self.config.read(self.ini_path)
+        else:
+            # File does not exist, so create it with a [General] section
+            self.config["General"] = {}
+            self.sync()  # write out the initial config
+
+        # In case the file existed but didn't include a [General] section,
+        # we ensure it's present.
+        if "General" not in self.config:
+            self.config["General"] = {}
+
+    def setValue(self, key, value):
+        """
+        Mimics Settings.setValue(key, value)
+        Stores the value in the [General] section of the .ini file.
+        """
+        self.config["General"][key] = str(value)
+
+    def value(self, key, default=None):
+        """
+        Mimics Settings.value(key, default)
+        Reads the value from the [General] section. Returns `default` if not present.
+        """
+        return self.config["General"].get(key, default)
+
+    def sync(self):
+        """
+        Mimics Settings.sync()
+        Writes the config data out to the .ini file.
+        """
+        with open(self.ini_path, "w") as f:
+            self.config.write(f)
 
 copy_text = "Copy Text"
 output_text = "Output:"
@@ -154,9 +199,23 @@ class GenerateDialog(QDialog):
         return True
 
 class PGP_Main(QMainWindow):
-    error_window_shown = pyqtSignal()
-    def __init__(self, test=False):
+    def __init__(self, test=False, ini_path=None):
         super().__init__()
+
+        # Decide where to load/save config.ini.
+        # If ini_path is provided, use it; otherwise, default to app_dir/config.ini
+        if ini_path:
+            self.settings_path = ini_path
+        else:
+            app_dir = os.path.dirname(os.path.abspath(__file__))
+            self.settings_path = os.path.join(app_dir, "config.ini")
+
+        self.settings = Settings(self.settings_path)
+        # Load the key location if it was saved before
+        self.key_location = self.settings.value("key_location", None)
+
+        self.key_boxes = {"private": [], "public": []}
+        self.setup_keys()
 
         self.test_mode = test
         self.error_window = QMessageBox()
@@ -180,6 +239,11 @@ class PGP_Main(QMainWindow):
         # set key location open
         set_menu = QAction('Set Key Location', self)
         set_menu.triggered.connect(self.set_key_location)
+        file_menu.addAction(set_menu)
+
+        # set key location open
+        set_menu = QAction('Load Keys', self)
+        set_menu.triggered.connect(self.load_keys)
         file_menu.addAction(set_menu)
 
         # help menu
@@ -452,6 +516,25 @@ class PGP_Main(QMainWindow):
 
         self.setup_keys()
 
+    def _set_key(self, location):
+        self.key_location = location
+        self.settings.setValue("key_location", location)
+        self.settings.sync()  # Force an immediate save to config.ini
+
+        if not self.test_mode:
+            QMessageBox.information(self, "Keys generated", "New keys have been generated.")
+
+        self.setup_keys(True)
+
+    def set_key_location(self):
+        loc = QFileDialog.getExistingDirectory(self, 'Select Folder', "/home")
+        if loc:
+            self.key_location = loc
+            self.settings.setValue("key_location", loc)  # Save to settings
+
+    def load_keys(self):
+        self.setup_keys(True)
+
     def copy_text(self, textbox, copyButton, needs_pgp=True):
         # Copy the text from the text box to the clipboard
         text = textbox.toPlainText()
@@ -519,20 +602,8 @@ class PGP_Main(QMainWindow):
         self.dlg.keys_generated.connect(self._set_key)
         # Executes the GenerateDialog window
         self.dlg.exec()
-        # Runs the setup_keys function after the GenerateDialog window is closed
+        # Runs the setup_keys function after the
 
-    def _set_key(self, location):
-        # Sets the key_location attribute to the specified location
-
-        self.key_location = location
-
-        if not self.test_mode:
-            QMessageBox.information(self, "Keys generated", "New keys have been generated.")
-
-        self.setup_keys(True)
-
-    def set_key_location(self):
-        loc = QFileDialog.getExistingDirectory(self, 'Select Folder', "/home")
-        if loc:
-            self.key_location = loc
-            self.setup_keys(True)
+    def closeEvent(self, event):
+        self.settings.sync()
+        super().closeEvent(event)
