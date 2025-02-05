@@ -27,7 +27,7 @@ def get_stored_keys(key_dir):
     pri_key_str = ""
     try:
         # check if the key files exist
-        if os.path.exists(pub_key_path) and os.path.exists(pri_key_path):
+        if os.path.isfile(pub_key_path) and os.path.isfile(pri_key_path):
             # load the public key file as a string
             with io.open(pub_key_path, 'r', encoding='utf-8') as pub_file:
                 pub_key_str = pub_file.read()

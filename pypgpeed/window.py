@@ -1,6 +1,8 @@
 import configparser
 import os
 import re
+import subprocess
+import sys
 import webbrowser
 
 import pyperclip
@@ -265,8 +267,8 @@ class PGP_Main(QMainWindow):
         file_menu.addAction(set_menu)
 
         # set key location open
-        set_menu = QAction('Load Keys', self)
-        set_menu.triggered.connect(self.load_keys)
+        set_menu = QAction('Open Key Location', self)
+        set_menu.triggered.connect(self.show_keys)
         file_menu.addAction(set_menu)
 
         # help menu
@@ -581,6 +583,28 @@ class PGP_Main(QMainWindow):
         # Wait for 3 seconds
         QTimer.singleShot(1500, self._return_box_to_normal)
 
+    def show_keys(self):
+        key_location = self.settings.value("key_location")
+
+        if not key_location:
+            QMessageBox.warning(self, "Error", "No key location set")
+            return
+
+        key_location = os.path.expanduser(key_location)  # Handle '~' in paths
+
+        if not os.path.exists(key_location):
+            QMessageBox.warning(self, "Error", "Key location does not exist")
+            return
+
+        try:
+            if sys.platform == "win32":
+                os.startfile(key_location)  # Windows
+            elif sys.platform == "darwin":
+                subprocess.Popen(["open", key_location])  # macOS
+            else:
+                subprocess.Popen(["xdg-open", key_location])  # Linux (including WSL)
+        except Exception as e:
+            QMessageBox.warning(self, "Error", f"Failed to open directory: {e}")
 
     def _return_box_to_normal(self):
         for box in self.copy_buttons:
@@ -601,6 +625,7 @@ class PGP_Main(QMainWindow):
             # only show on run
             if self.shown_message is False:
                 msg_box.exec()
+                self.shown_message = True
             return False
 
         # loop items with pri or public keys
