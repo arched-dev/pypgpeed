@@ -16,12 +16,8 @@ def get_box(*args, **kwargs):
 
     return box
 
-def get_stored_keys(key_dir=None):
+def get_stored_keys(key_dir):
     # get the home directory path
-
-    # set the keys directory path
-    if not key_dir:
-        key_dir = os.path.join(os.path.expanduser('~'), 'pgp_keys')
 
     # set the key file paths
     pub_key_path = os.path.join(key_dir, 'pub_key.key')
@@ -29,18 +25,20 @@ def get_stored_keys(key_dir=None):
 
     pub_key_str = ""
     pri_key_str = ""
+    try:
+        # check if the key files exist
+        if os.path.exists(pub_key_path) and os.path.exists(pri_key_path):
+            # load the public key file as a string
+            with io.open(pub_key_path, 'r', encoding='utf-8') as pub_file:
+                pub_key_str = pub_file.read()
 
-    # check if the key files exist
-    if os.path.exists(pub_key_path) and os.path.exists(pri_key_path):
-        # load the public key file as a string
-        with io.open(pub_key_path, 'r', encoding='utf-8') as pub_file:
-            pub_key_str = pub_file.read()
+            # load the private key file as a string
+            with io.open(pri_key_path, 'r', encoding='utf-8') as pri_file:
+                pri_key_str = pri_file.read()
 
-        # load the private key file as a string
-        with io.open(pri_key_path, 'r', encoding='utf-8') as pri_file:
-            pri_key_str = pri_file.read()
-
-    return pri_key_str, pub_key_str
+        return pri_key_str, pub_key_str
+    except:
+        return None, None
 
 
 def make_directory(path):

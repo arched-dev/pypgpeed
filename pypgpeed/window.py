@@ -112,7 +112,8 @@ class GenerateDialog(QDialog):
         self.output_location_box = QTextEdit()
         self.output_location_box.setTabChangesFocus(True)
         self.output_location_box.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.output_location_box.setText(os.path.expanduser('~' + "/pgp_keys"))
+        self.key_loc = self.parent().settings.value("key_location", None) or '~' + os.path.expanduser("/pgp_keys")
+        self.output_location_box.setText(self.key_loc)
         self.output_location_box.setFixedHeight(45)
         self.output_location_box.setObjectName("gen_output_location_box")
 
@@ -199,23 +200,45 @@ class GenerateDialog(QDialog):
         return True
 
 class PGP_Main(QMainWindow):
+
+    shown_message: str = False
+
     def __init__(self, test=False, ini_path=None):
         super().__init__()
 
         # Decide where to load/save config.ini.
         # If ini_path is provided, use it; otherwise, default to app_dir/config.ini
+
+
+        if ini_path and os.path.isdir(ini_path):
+            ini_path = os.path.join(ini_path, "config.ini")
+
         if ini_path:
+            if os.path.isfile(ini_path):
+                #rename the file to have ini extension
+                if not ini_path.endswith(".ini"):
+                    os.rename(ini_path, ini_path + ".ini")
+                    ini_path += ".ini"
             self.settings_path = ini_path
         else:
-            app_dir = os.path.dirname(os.path.abspath(__file__))
-            self.settings_path = os.path.join(app_dir, "config.ini")
+            home = os.path.expanduser("~")
+            persis_path = os.path.join(home, "Persist")
+            if os.path.isdir(persis_path):
+                keys_path = os.path.join(persis_path, "pgp_keys")
+                if not os.path.isdir(keys_path):
+                    os.makedirs(keys_path)
+                self.settings_path = os.path.join(persis_path, "config.ini")
+            else:
+                app_dir = os.path.dirname(os.path.abspath(__file__))
+                self.settings_path = os.path.join(app_dir, "config.ini")
 
         self.settings = Settings(self.settings_path)
         # Load the key location if it was saved before
         self.key_location = self.settings.value("key_location", None)
 
         self.key_boxes = {"private": [], "public": []}
-        self.setup_keys()
+        if self.key_location:
+            self.setup_keys()
 
         self.test_mode = test
         self.error_window = QMessageBox()
@@ -261,8 +284,8 @@ class PGP_Main(QMainWindow):
         edit_menu.addAction(help_menu)
 
         # sets the location of the key files for the private and publiuc keys
-        self.key_location = None
-        self.key_boxes = {"private": [], "public": []}
+        # self.key_location = None
+        # self.key_boxes = {"private": [], "public": []}
         self.copy_buttons = []
 
         # Set window title
@@ -519,7 +542,7 @@ class PGP_Main(QMainWindow):
     def _set_key(self, location):
         self.key_location = location
         self.settings.setValue("key_location", location)
-        self.settings.sync()  # Force an immediate save to config.ini
+        self.settings.sync()  # Save immediately
 
         if not self.test_mode:
             QMessageBox.information(self, "Keys generated", "New keys have been generated.")
@@ -531,6 +554,7 @@ class PGP_Main(QMainWindow):
         if loc:
             self.key_location = loc
             self.settings.setValue("key_location", loc)  # Save to settings
+            self.settings.sync()  # Ensure it's written immediately
 
     def load_keys(self):
         self.setup_keys(True)
@@ -563,17 +587,20 @@ class PGP_Main(QMainWindow):
             # Change the button text back to copy_text
             box.setText(copy_text)
 
-    def setup_keys(self, check=False):
+    def setup_keys(self, check=True):
         """adds the private and public keys to the window."""
-        pri, pub = get_stored_keys(self.key_location)
+        pri, pub = None, None
+        if self.settings.value("key_location"):
+            pri, pub = get_stored_keys(self.settings.value("key_location"))
 
         if check and (not pri or not pub):
             msg_box = QMessageBox()
             msg_box.setWindowTitle("Keys Error")
             msg_box.setText(
-                f"Either the public key, or private key is not found in {self.key_location}, make sure the files are named 'pub_key.key' & 'pri_key.key'")
+                f"It doesn't seem like you have any keys saved. Click file, and 'Set key location', then 'Generate New Keys' to create some.")
             # only show on run
-            not self.test_mode and msg_box.exec()
+            if self.shown_message is False:
+                msg_box.exec()
             return False
 
         # loop items with pri or public keys
@@ -602,6 +629,7 @@ class PGP_Main(QMainWindow):
         self.dlg.keys_generated.connect(self._set_key)
         # Executes the GenerateDialog window
         self.dlg.exec()
+        self.load_keys()
         # Runs the setup_keys function after the
 
     def closeEvent(self, event):
