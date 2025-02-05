@@ -239,8 +239,7 @@ class PGP_Main(QMainWindow):
         self.key_location = self.settings.value("key_location", None)
 
         self.key_boxes = {"private": [], "public": []}
-        if self.key_location:
-            self.setup_keys()
+
 
         self.test_mode = test
         self.error_window = QMessageBox()
@@ -357,6 +356,7 @@ class PGP_Main(QMainWindow):
         decrypt_layout.addWidget(decrypt_message_box)
         decrypt_layout.addWidget(QLabel("Your Private Key:"))
         decrypt_layout.addWidget(decrypt_private_key_box)
+        self.decrypt_private_key_box = decrypt_private_key_box
         decrypt_layout.addWidget(QLabel("Your Passphrase:"))
         decrypt_layout.addWidget(decrypt_pass_box)
         decrypt_layout.addWidget(QLabel(output_text))
@@ -470,10 +470,12 @@ class PGP_Main(QMainWindow):
         sign_layout.addWidget(sign_message_box)
         sign_layout.addWidget(QLabel("Your Private Key:"))
         sign_layout.addWidget(sign_private_key_box)
+        self.sign_private_key_box = sign_private_key_box
         sign_layout.addWidget(QLabel("Your Passphrase:"))
         sign_layout.addWidget(sign_passphrase_box)
         sign_layout.addWidget(QLabel(output_text))
         sign_layout.addWidget(sign_output_box)
+        sign_layout.addWidget(sign_widget)
         sign_layout.addWidget(sign_widget)
 
 
@@ -524,6 +526,7 @@ class PGP_Main(QMainWindow):
         verify_layout.addWidget(verify_message_box)
         verify_layout.addWidget(QLabel("Their Public Key:"))
         verify_layout.addWidget(verify_public_key_box)
+        self.verify_public_key_box = verify_public_key_box
         verify_layout.addWidget(QLabel(output_text))
         verify_layout.addWidget(verify_output_box)
         verify_layout.addWidget(verify_widget)
@@ -539,7 +542,8 @@ class PGP_Main(QMainWindow):
         central_widget.setLayout(main_layout)
         self.setCentralWidget(central_widget)
 
-        self.setup_keys()
+        if self.key_location:
+            self.setup_keys()
 
     def _set_key(self, location):
         self.key_location = location
@@ -557,6 +561,7 @@ class PGP_Main(QMainWindow):
             self.key_location = loc
             self.settings.setValue("key_location", loc)  # Save to settings
             self.settings.sync()  # Ensure it's written immediately
+            self.setup_keys()
 
     def load_keys(self):
         self.setup_keys(True)
@@ -622,10 +627,14 @@ class PGP_Main(QMainWindow):
             msg_box.setWindowTitle("Keys Error")
             msg_box.setText(
                 f"It doesn't seem like you have any keys saved. Click file, and 'Set key location', then 'Generate New Keys' to create some.")
+            self.verify_public_key_box.setText("")
+            self.sign_private_key_box.setText("")
+            self.decrypt_private_key_box.setText("")
+
             # only show on run
-            if self.shown_message is False:
-                msg_box.exec()
-                self.shown_message = True
+
+            msg_box.exec()
+
             return False
 
         # loop items with pri or public keys
@@ -633,8 +642,11 @@ class PGP_Main(QMainWindow):
             for el in v:
                 if k == "private":
                     el.setText(pri.strip())
+                    self.decrypt_private_key_box.setText(pri.strip())
+                    self.sign_private_key_box.setText(pri.strip())
                 else:
                     el.setText(pub.strip())
+                    self.verify_public_key_box.setText(pub.strip())
         return True
 
     def help_show(self):
