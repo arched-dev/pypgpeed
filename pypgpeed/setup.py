@@ -15,7 +15,7 @@ if sys.platform == "win32":
 
 setup(
     name="Pypgpeed",
-    version="1.0",
+    version="1.0.1",
     description="PGP encryption and decryption, signing etc",
     options={"build_exe": build_exe_options},
     executables=[Executable("run.py", base=base)],

@@ -1,0 +1,7 @@
+# Suggestions
+
+- Add development tooling (black and ruff) to the project config (e.g., `pyproject.toml` or `requirements-dev.txt`) so automated formatting/linting can run; these modules are not currently available in the environment.
+- pypgpeed/functions.py:28-41 (ruff E722) – `get_stored_keys` catches all exceptions and returns `(None, None)` on any error, masking permission/path issues and making key-loading failures hard to debug. Catch specific `OSError`/`IOError`, log or surface the error, and let unexpected exceptions propagate. Low-risk change; re-run unit/UI flows that load keys.
+- pypgpeed/pgp.py:197-204 (ruff E722) – `verify_message` wraps verification in a bare `except` and returns `False`, swallowing parsing/crypto errors that could signal corrupted or malicious input. Limit the exception types (e.g., `PGPError`, `ValueError`) and surface the reason to the caller/UI. Low-risk; retest message verification with valid/invalid signatures.
+- pypgpeed/window.py:569-583 (ruff E713/E722) – `copy_text` uses `not \"---\" in text` and a bare `except` around clipboard operations. The condition is hard to read and the blanket `except` hides clipboard/pypeclip errors. Switch to `'---' not in text` with explicit parentheses and catch specific clipboard exceptions. UI copy flow should be smoke-tested after change.
+- pypgpeed/pgp.py:1-5 (ruff F811) – `pgpy` is imported twice; the second import shadows the first and is redundant. Remove the duplicate import to reduce confusion. No behavioural risk; run lints only.
